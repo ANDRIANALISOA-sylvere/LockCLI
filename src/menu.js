@@ -8,6 +8,7 @@ import {
 import { CONSTANT } from "./constants.js";
 import chalk from "chalk";
 import Table from "cli-table3";
+import boxen from "boxen";
 
 async function showMenu() {
   const action = await select({
@@ -35,7 +36,13 @@ async function showMenu() {
       await handleDelete();
       break;
     case CONSTANT.EXIT:
-      console.log("Au revoir !");
+      console.log(
+        boxen(chalk.yellow("Au revoir !"), {
+          padding: 1,
+          borderColor: "yellow",
+          borderStyle: "round",
+        }),
+      );
       process.exit(0);
   }
 
@@ -53,7 +60,13 @@ function handleShow() {
   const passwords = getPasswords();
 
   if (passwords.length === 0) {
-    console.log(chalk.yellow("  Aucun mot de passe enregistré"));
+    console.log(
+      boxen(chalk.yellow("Aucun mot de passe enregistré"), {
+        padding: 1,
+        borderColor: "yellow",
+        borderStyle: "round",
+      }),
+    );
     return;
   }
 
@@ -86,7 +99,13 @@ function handleShow() {
 async function handleUpdate() {
   const passwords = getPasswords();
   if (passwords.length === 0) {
-    console.log("Aucun mot de passe enregistré");
+    console.log(
+      boxen(chalk.yellow("Aucun mot de passe enregistré"), {
+        padding: 1,
+        borderColor: "yellow",
+        borderStyle: "round",
+      }),
+    );
     return;
   }
 
@@ -108,7 +127,13 @@ async function handleUpdate() {
 async function handleDelete() {
   const passwords = getPasswords();
   if (passwords.length === 0) {
-    console.log("Aucun mot de passe enregistré");
+    console.log(
+      boxen(chalk.yellow("Aucun mot de passe enregistré"), {
+        padding: 1,
+        borderColor: "yellow",
+        borderStyle: "round",
+      }),
+    );
     return;
   }
 
@@ -128,7 +153,13 @@ async function handleDelete() {
   if (ok) {
     await deletePassword(service);
   } else {
-    console.log("Suppression annulée");
+    console.log(
+      boxen(chalk.red("Suppression annulée"), {
+        padding: 1,
+        borderColor: "red",
+        borderStyle: "round",
+      }),
+    );
   }
 }
 

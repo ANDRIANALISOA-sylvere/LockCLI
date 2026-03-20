@@ -1,6 +1,7 @@
-import bcrypt from "bcrypt";
 import fs from "fs";
 import { LOCKCLI_DIR } from "./auth.js";
+import boxen from "boxen";
+import chalk from "chalk";
 
 export const VAULT_FILE = LOCKCLI_DIR + "/vault.json";
 
@@ -23,7 +24,13 @@ async function addPassword(service, username, password) {
   });
 
   saveVault(vault);
-  console.log(`Mot de passe pour "${service}" ajouté avec succès`);
+  console.log(
+    boxen(chalk.green(`Mot de passe pour "${service}" ajouté avec succès`), {
+      padding: 1,
+      borderColor: "green",
+      borderStyle: "round",
+    }),
+  );
 }
 
 function getPasswords() {
@@ -35,13 +42,25 @@ async function deletePassword(service) {
 
   const exists = vault.find((item) => item.service === service);
   if (!exists) {
-    console.log(`Service "${service}" introuvable`);
+    console.log(
+      boxen(chalk.yellow(`Service "${service}" introuvable`), {
+        padding: 1,
+        borderColor: "yellow",
+        borderStyle: "round",
+      }),
+    );
     return;
   }
 
   const updated = vault.filter((item) => item.service !== service);
   saveVault(updated);
-  console.log(`Service "${service}" supprimé`);
+  console.log(
+    boxen(chalk.green(`Service "${service}" supprimé`), {
+      padding: 1,
+      borderColor: "green",
+      borderStyle: "round",
+    }),
+  );
 }
 
 async function updatePassword(service, password) {
@@ -49,7 +68,13 @@ async function updatePassword(service, password) {
 
   const item = vault.find((item) => item.service === service);
   if (!item) {
-    console.log(`Service "${service}" introuvable`);
+    console.log(
+      boxen(chalk.yellow(`Service "${service}" introuvable`), {
+        padding: 1,
+        borderColor: "yellow",
+        borderStyle: "round",
+      }),
+    );
     return;
   }
 
@@ -57,7 +82,13 @@ async function updatePassword(service, password) {
   item.updatedAt = Date.now();
 
   saveVault(vault);
-  console.log(`Mot de passe pour "${service}" mis à jour`);
+  console.log(
+    boxen(chalk.green(`Mot de passe pour "${service}" mis à jour`), {
+      padding: 1,
+      borderColor: "green",
+      borderStyle: "round",
+    }),
+  );
 }
 
 export { addPassword, getPasswords, deletePassword, updatePassword };

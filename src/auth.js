@@ -2,6 +2,8 @@ import fs from "fs";
 import bcrypt from "bcrypt";
 import os from "os";
 import { password } from "@inquirer/prompts";
+import boxen from "boxen";
+import chalk from "chalk";
 
 export const LOCKCLI_DIR = os.homedir() + "/.lockcli";
 const MASTER_FILE = LOCKCLI_DIR + "/master.json";
@@ -27,7 +29,13 @@ async function createMasterPassword() {
   };
 
   fs.writeFileSync(MASTER_FILE, JSON.stringify(data, null, 2));
-  console.log("Mot de passe LockCLI crée avec succès");
+  console.log(
+    boxen(chalk.cyan("Mot de passe LockCLI crée avec succès"), {
+      padding: 1,
+      borderColor: "cyan",
+      borderStyle: "round",
+    }),
+  );
 }
 
 async function verifyMasterPassword() {
@@ -40,11 +48,23 @@ async function verifyMasterPassword() {
   const isValid = await bcrypt.compare(pass, data.master);
 
   if (!isValid) {
-    console.log("Mot de passe incorrect");
+    console.log(
+      boxen(chalk.red("Mot de passe incorrect"), {
+        padding: 1,
+        borderColor: "red",
+        borderStyle: "round",
+      }),
+    );
     process.exit(1);
   }
 
-  console.log("Accès autorisé");
+  console.log(
+    boxen(chalk.green("Accès autorisé"), {
+      padding: 1,
+      borderColor: "green",
+      borderStyle: "round",
+    }),
+  );
   return true;
 }
 
