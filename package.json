@@ -1,5 +1,5 @@
 {
-  "name": "lockcli",
+  "name": "@josephin/lockcli",
   "version": "1.0.0",
   "description": "A secure CLI password manager — store, retrieve and manage your credentials locally from your terminal.",
   "main": "index.js",
@@ -17,9 +17,14 @@
     "nodemon": "^3.1.14"
   },
   "bin": {
-    "lockcli": "./src/index.js"
+    "lockcli": "src/index.js"
   },
-  "keywords": ["cli", "password", "manager", "security"],
+  "keywords": [
+    "cli",
+    "password",
+    "manager",
+    "security"
+  ],
   "author": "Joséphin Sylvère ANDRIANALISOA",
   "license": "MIT"
 }
