@@ -53,7 +53,7 @@ async function updatePassword(service, password) {
     return;
   }
 
-  item.password = await bcrypt.hash(password, 10);
+  item.password = password;
   item.updatedAt = Date.now();
 
   saveVault(vault);

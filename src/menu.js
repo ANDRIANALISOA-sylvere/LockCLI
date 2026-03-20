@@ -6,10 +6,8 @@ import {
   updatePassword,
 } from "./vault.js";
 import { CONSTANT } from "./constants.js";
-
-function formatDate(date) {
-  return date.getFullYear();
-}
+import chalk from "chalk";
+import Table from "cli-table3";
 
 async function showMenu() {
   const action = await select({
@@ -55,17 +53,34 @@ function handleShow() {
   const passwords = getPasswords();
 
   if (passwords.length === 0) {
-    console.log("Aucun mot de passe enregistré");
+    console.log(chalk.yellow("  Aucun mot de passe enregistré"));
     return;
   }
 
-  console.log("\n Vos mots de passe :\n");
-  passwords.forEach((item, index) => {
-    console.log(`${index + 1}. ${item.service}`);
-    console.log(`   Username : ${item.username}`);
-    console.log(`   Mot de passe : ${item.password}`);
-    console.log(`   Ajouté le : ${new Date(item.createdAt).toLocaleDateString()}\n`);
+  const table = new Table({
+    head: [
+      chalk.yellow("#"),
+      chalk.yellow("Service"),
+      chalk.yellow("Username"),
+      chalk.yellow("Mot de passe"),
+      chalk.yellow("Ajouté le"),
+    ],
+    colWidths: [5, 20, 30, 15, 15],
+    style: { border: ["gray"] },
   });
+
+  passwords.forEach((item, index) => {
+    table.push([
+      chalk.white(index + 1),
+      chalk.bold.cyan(item.service),
+      chalk.white(item.username),
+      chalk.red(item.password),
+      chalk.dim(new Date(item.createdAt).toLocaleDateString("fr-FR")),
+    ]);
+  });
+
+  console.log("\n" + chalk.bold.white("  Vos mots de passe\n"));
+  console.log(table.toString());
 }
 
 async function handleUpdate() {
