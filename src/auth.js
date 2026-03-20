@@ -59,7 +59,7 @@ async function verifyMasterPassword() {
   }
 
   console.log(
-    boxen(chalk.green("Accès autorisé"), {
+    boxen(chalk.green("Bienvenue sur LockCLI"), {
       padding: 1,
       borderColor: "green",
       borderStyle: "round",
