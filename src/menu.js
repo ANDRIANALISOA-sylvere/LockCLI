@@ -78,7 +78,7 @@ function handleShow(masterPassword) {
       chalk.yellow("Mot de passe"),
       chalk.yellow("Ajouté le"),
     ],
-    colWidths: [5, 20, 30, 15, 15],
+    colWidths: [5, 20, 30, 60, 15],
     style: { border: ["gray"] },
   });
 
