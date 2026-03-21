@@ -16,16 +16,17 @@ function showBanner() {
 
 async function main() {
   showBanner();
+  let masterPassword;
   if (!isMasterPasswordSet()) {
-    await createMasterPassword();
-    await showMenu();
+    masterPassword = await createMasterPassword();
+    await showMenu(masterPassword);
 
     return;
   }
 
-  await verifyMasterPassword();
+  masterPassword = await verifyMasterPassword();
 
-  await showMenu();
+  await showMenu(masterPassword);
 }
 
 main();

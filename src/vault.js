@@ -2,6 +2,7 @@ import fs from "fs";
 import { LOCKCLI_DIR } from "./auth.js";
 import boxen from "boxen";
 import chalk from "chalk";
+import { decrypt, encrypt } from "./crypto.js";
 
 export const VAULT_FILE = LOCKCLI_DIR + "/vault.json";
 
@@ -14,12 +15,12 @@ function saveVault(data) {
   fs.writeFileSync(VAULT_FILE, JSON.stringify(data, null, 2));
 }
 
-async function addPassword(service, username, password) {
+async function addPassword(service, username, password, masterPassword) {
   const vault = readVault();
   vault.push({
     service,
     username,
-    password,
+    password: encrypt(password, masterPassword),
     createdAt: Date.now(),
   });
 
@@ -33,8 +34,12 @@ async function addPassword(service, username, password) {
   );
 }
 
-function getPasswords() {
-  return readVault();
+function getPasswords(masterPassword) {
+  const vault = readVault();
+  return vault.map((item) => ({
+    ...item,
+    password: decrypt(item.password, masterPassword),
+  }));
 }
 
 async function deletePassword(service) {
@@ -63,7 +68,7 @@ async function deletePassword(service) {
   );
 }
 
-async function updatePassword(service, password) {
+async function updatePassword(service, password, masterPassword) {
   const vault = readVault();
 
   const item = vault.find((item) => item.service === service);
@@ -78,7 +83,7 @@ async function updatePassword(service, password) {
     return;
   }
 
-  item.password = password;
+  item.password = encrypt(password, masterPassword);
   item.updatedAt = Date.now();
 
   saveVault(vault);

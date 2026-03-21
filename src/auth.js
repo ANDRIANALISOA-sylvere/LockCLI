@@ -36,6 +36,8 @@ async function createMasterPassword() {
       borderStyle: "round",
     }),
   );
+
+  return pass;
 }
 
 async function verifyMasterPassword() {
@@ -65,7 +67,7 @@ async function verifyMasterPassword() {
       borderStyle: "round",
     }),
   );
-  return true;
+  return pass;
 }
 
 export { isMasterPasswordSet, createMasterPassword, verifyMasterPassword };

@@ -10,7 +10,7 @@ import chalk from "chalk";
 import Table from "cli-table3";
 import boxen from "boxen";
 
-async function showMenu() {
+async function showMenu(masterPassword) {
   const action = await select({
     message: "Que voulez-vous faire ?",
     choices: [
@@ -24,16 +24,16 @@ async function showMenu() {
 
   switch (action) {
     case CONSTANT.ADD_PASSWOR:
-      await handleAdd();
+      await handleAdd(masterPassword);
       break;
     case CONSTANT.SEE_PASSWORD:
-      handleShow();
+      handleShow(masterPassword);
       break;
     case CONSTANT.UPDATED_PASSWORD:
-      await handleUpdate();
+      await handleUpdate(masterPassword);
       break;
     case CONSTANT.DELETE_PASSWORD:
-      await handleDelete();
+      await handleDelete(masterPassword);
       break;
     case CONSTANT.EXIT:
       console.log(
@@ -46,18 +46,18 @@ async function showMenu() {
       process.exit(0);
   }
 
-  await showMenu();
+  await showMenu(masterPassword);
 }
 
-async function handleAdd() {
+async function handleAdd(masterPassword) {
   const service = await input({ message: "Nom du service (ex: Facebook) :" });
   const username = await input({ message: "Username ou email ou Num Tel:" });
   const pass = await password({ message: "Mot de passe :", mask: "*" });
-  await addPassword(service, username, pass);
+  await addPassword(service, username, pass, masterPassword);
 }
 
-function handleShow() {
-  const passwords = getPasswords();
+function handleShow(masterPassword) {
+  const passwords = getPasswords(masterPassword);
 
   if (passwords.length === 0) {
     console.log(
@@ -96,8 +96,8 @@ function handleShow() {
   console.log(table.toString());
 }
 
-async function handleUpdate() {
-  const passwords = getPasswords();
+async function handleUpdate(masterPassword) {
+  const passwords = getPasswords(masterPassword);
   if (passwords.length === 0) {
     console.log(
       boxen(chalk.yellow("Aucun mot de passe enregistré"), {
@@ -121,11 +121,11 @@ async function handleUpdate() {
     message: "Nouveau mot de passe :",
     mask: "*",
   });
-  await updatePassword(service, newPass);
+  await updatePassword(service, newPass, masterPassword);
 }
 
-async function handleDelete() {
-  const passwords = getPasswords();
+async function handleDelete(masterPassword) {
+  const passwords = getPasswords(masterPassword);
   if (passwords.length === 0) {
     console.log(
       boxen(chalk.yellow("Aucun mot de passe enregistré"), {
