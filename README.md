@@ -140,6 +140,23 @@ npm uninstall -g @josephin/lockcli
 
 ---
 
+## Contributing
+
+Contributions are welcome! Here's how to get started:
+```bash
+# Clone the repository
+git clone https://github.com/ANDRIANALISOA-sylvere/LockCLI
+cd LockCLI
+
+# Install dependencies
+npm install
+
+# Run locally
+npm start
+```
+
+Feel free to open an issue or submit a pull request on [GitHub](https://github.com/ANDRIANALISOA-sylvere/LockCLI).
+
 ## Author
 
 **Sylvère Andrianalisoa** — [@ANDRIANALISOA-sylvere](https://github.com/ANDRIANALISOA-sylvere)
