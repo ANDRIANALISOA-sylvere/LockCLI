@@ -1,0 +1,10 @@
+version: 2
+
+scanning:
+  # Exclude test files - they contain fake test credentials only
+  paths-ignore:
+    - "tests/**"
+    - "**/*.test.js"
+    - "**/*.test.ts"
+    - "**/*.spec.js"
+    - "**/*.spec.ts"

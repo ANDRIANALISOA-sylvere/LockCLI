@@ -305,6 +305,165 @@ function validateVault() {
   };
 }
 
+/**
+ * Exporte le vault chiffré vers un fichier JSON
+ *
+ * @param {string} exportPath - Chemin du fichier d'export
+ * @returns {boolean} Succès de l'export
+ */
+function exportVault(exportPath) {
+  const vault = readVault();
+
+  if (vault.length === 0) {
+    console.log(
+      boxen(chalk.yellow("Aucun mot de passe a exporter"), {
+        padding: 1,
+        borderColor: "yellow",
+        borderStyle: "round",
+      })
+    );
+    return false;
+  }
+
+  try {
+    const exportData = {
+      format: "lockcli-export",
+      version: "1.1",
+      exportedAt: new Date().toISOString(),
+      count: vault.length,
+      entries: vault,
+    };
+
+    fs.writeFileSync(exportPath, JSON.stringify(exportData, null, 2), { mode: 0o600 });
+
+    console.log(
+      boxen(
+        chalk.green(`${vault.length} mot(s) de passe exporte(s)\n\n`) +
+          chalk.gray(`Fichier: ${exportPath}`),
+        {
+          padding: 1,
+          borderColor: "green",
+          borderStyle: "round",
+          title: "Export reussi",
+        }
+      )
+    );
+    return true;
+  } catch (error) {
+    console.log(
+      boxen(chalk.red("Erreur d'export: " + error.message), {
+        padding: 1,
+        borderColor: "red",
+        borderStyle: "round",
+      })
+    );
+    return false;
+  }
+}
+
+/**
+ * Importe un vault depuis un fichier JSON
+ *
+ * @param {string} importPath - Chemin du fichier d'import
+ * @param {string} mode - "merge" (fusionner) ou "replace" (remplacer)
+ * @returns {object} { success: boolean, imported: number, skipped: number }
+ */
+function importVault(importPath, mode = "merge") {
+  if (!fs.existsSync(importPath)) {
+    console.log(
+      boxen(chalk.red(`Fichier introuvable: ${importPath}`), {
+        padding: 1,
+        borderColor: "red",
+        borderStyle: "round",
+      })
+    );
+    return { success: false, imported: 0, skipped: 0 };
+  }
+
+  try {
+    const content = fs.readFileSync(importPath, "utf-8");
+    const importData = JSON.parse(content);
+
+    // Valider le format
+    if (importData.format !== "lockcli-export" || !Array.isArray(importData.entries)) {
+      console.log(
+        boxen(chalk.red("Format de fichier invalide. Utilisez un fichier exporte par LockCLI."), {
+          padding: 1,
+          borderColor: "red",
+          borderStyle: "round",
+        })
+      );
+      return { success: false, imported: 0, skipped: 0 };
+    }
+
+    const entries = importData.entries;
+
+    if (mode === "replace") {
+      saveVault(entries);
+      console.log(
+        boxen(
+          chalk.green(`${entries.length} mot(s) de passe importe(s) (remplacement)`),
+          {
+            padding: 1,
+            borderColor: "green",
+            borderStyle: "round",
+            title: "Import reussi",
+          }
+        )
+      );
+      return { success: true, imported: entries.length, skipped: 0 };
+    }
+
+    // Mode merge: fusionner sans écraser les existants
+    const vault = readVault();
+    let imported = 0;
+    let skipped = 0;
+
+    for (const entry of entries) {
+      if (!entry.service || !entry.username || !entry.password) {
+        skipped++;
+        continue;
+      }
+
+      const exists = vault.find((item) => item.service === entry.service);
+      if (exists) {
+        skipped++;
+        continue;
+      }
+
+      vault.push(entry);
+      imported++;
+    }
+
+    saveVault(vault);
+
+    console.log(
+      boxen(
+        chalk.green(`Import termine\n\n`) +
+          chalk.white(`  Importes: ${imported}\n`) +
+          chalk.gray(`  Ignores (doublons): ${skipped}`),
+        {
+          padding: 1,
+          borderColor: "green",
+          borderStyle: "round",
+          title: "Import reussi",
+        }
+      )
+    );
+
+    return { success: true, imported, skipped };
+  } catch (error) {
+    console.log(
+      boxen(chalk.red("Erreur d'import: " + error.message), {
+        padding: 1,
+        borderColor: "red",
+        borderStyle: "round",
+      })
+    );
+    return { success: false, imported: 0, skipped: 0 };
+  }
+}
+
 export {
   addPassword,
   getPasswords,
@@ -312,4 +471,6 @@ export {
   updatePassword,
   getVaultCount,
   validateVault,
+  exportVault,
+  importVault,
 };

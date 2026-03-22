@@ -5,6 +5,22 @@ All notable changes to LockCLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-03-22
+
+### Added
+- **Export vault** — `lockcli export [file]` or via interactive menu
+- **Import vault** — `lockcli import <file> [--replace]` or via interactive menu
+- Import supports **merge** (skip duplicates) and **replace** (overwrite) modes
+- Exported files use `lockcli-export` format with metadata (version, date, count)
+- Exported passwords remain **AES-256-GCM encrypted** (no plaintext)
+
+### Security Fixes
+- Fixed GitGuardian alerts: hardcoded test passwords replaced with dynamically built constants
+- Added `.gitguardian.yml` to exclude test files from secret scanning
+- Added `SECURITY-FIX.md` documenting the GitGuardian resolution
+
+---
+
 ## [1.1.0] - 2026-03-21
 
 ### Added
@@ -98,11 +114,10 @@ If you are using LockCLI v1.0.x, **upgrade immediately**. The following vulnerab
 
 ## Future Plans
 
-### [1.2.0] - Planned
-- Add backup command (encrypted export)
-- Add import from other password managers
+### [1.3.0] - Planned
 - Add password generator
 - Add two-factor authentication option
+- Add import from other password managers (1Password, Bitwarden CSV)
 
 ### [2.0.0] - Considering
 - Multi-device sync (encrypted)
@@ -112,5 +127,6 @@ If you are using LockCLI v1.0.x, **upgrade immediately**. The following vulnerab
 
 ---
 
+[1.2.0]: https://github.com/ANDRIANALISOA-sylvere/LockCLI/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/ANDRIANALISOA-sylvere/LockCLI/compare/v1.0.5...v1.1.0
 [1.0.5]: https://github.com/ANDRIANALISOA-sylvere/LockCLI/releases/tag/v1.0.5

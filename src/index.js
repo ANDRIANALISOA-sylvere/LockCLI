@@ -25,8 +25,9 @@ import { checkMigrationNeeded, runMigration } from "./migration.js";
 import figlet from "figlet";
 import chalk from "chalk";
 import { showMenu } from "./menu.js";
+import { exportVault, importVault } from "./vault.js";
 
-const PACKAGE_VERSION = "1.1.0";
+const PACKAGE_VERSION = "1.2.0";
 
 function showBanner() {
   console.log(chalk.yellow(figlet.textSync("LockCLI", { font: "Big" })));
@@ -40,7 +41,9 @@ function showHelp() {
   console.log(chalk.cyan("\nLockCLI - Gestionnaire de mots de passe local\n"));
   console.log("Usage:");
   console.log("  lockcli          Menu interactif");
-  console.log("  lockcli update   Met à jour vault vers v" + PACKAGE_VERSION);
+  console.log("  lockcli update    Met à jour vault vers v" + PACKAGE_VERSION);
+  console.log("  lockcli export    Exporte le vault (chiffre) vers un fichier");
+  console.log("  lockcli import    Importe un vault depuis un fichier");
   console.log("  lockcli --version Affiche la version");
   console.log("  lockcli --help    Affiche cette aide\n");
   console.log(chalk.gray("Les donnees sont stockees localement dans ~/.lockcli/\n"));
@@ -89,6 +92,22 @@ async function main() {
 
   if (command === "update") {
     await handleUpdateCommand();
+    return;
+  }
+
+  if (command === "export") {
+    const exportPath = args[1] || `lockcli-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    exportVault(exportPath);
+    return;
+  }
+
+  if (command === "import") {
+    if (!args[1]) {
+      console.log(chalk.red("Usage: lockcli import <fichier> [--replace]"));
+      return;
+    }
+    const mode = args.includes("--replace") ? "replace" : "merge";
+    importVault(args[1], mode);
     return;
   }
 
