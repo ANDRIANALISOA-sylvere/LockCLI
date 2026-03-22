@@ -172,8 +172,6 @@ The update command will:
 3. Re-encrypt all entries with the new format
 4. Update your vault to v1.1
 
-See [SECURITY.md](SECURITY.md) for details.
-
 ---
 
 ## Tech Stack
@@ -210,64 +208,12 @@ See [SECURITY.md](SECURITY.md) for details.
 - Master password lost = data lost (no recovery)
 - Vulnerable to malware with user privileges
 
-> See [SECURITY.md](SECURITY.md) for full security policy and audit information.
-
----
-
-## Development
-
-```bash
-# Clone and install
-git clone https://github.com/YOUR_USERNAME/f-LockCLI.git
-cd f-LockCLI
-npm install
-
-# Run locally
-npm run dev
-
-# Run security tests
-npm run test:security
-
-# Build for production
-npm run build
-```
 
 ---
 
 ## Contributing
 
-Contributions welcome! Especially for:
-- Additional security audits
-- Cross-platform testing
-- Documentation improvements
 
-Please read [SECURITY.md](SECURITY.md) before contributing.
-
----
-
-## NPM
-
-```bash
-# Install
-npm install -g @josephin/lockcli
-
-# Update
-npm update -g @josephin/lockcli
-
-# Uninstall
-npm uninstall -g @josephin/lockcli
-```
-
-[View on npm](https://www.npmjs.com/package/@josephin/lockcli)
-
----
-
-## License
-
-MIT © Sylvère Andrianalisoa
-
----
-## Contributing
 
 Contributions are welcome! Here's how to get started:
 ```bash
@@ -280,9 +226,13 @@ npm install
 
 # Run locally
 npm start
+
+# Security test
+npm run test:security
 ```
 
 Feel free to open an issue or submit a pull request on [GitHub](https://github.com/ANDRIANALISOA-sylvere/LockCLI).
+npm : [View on npm](https://www.npmjs.com/package/@josephin/lockcli)
 
 ## Author
 
@@ -291,3 +241,10 @@ Feel free to open an issue or submit a pull request on [GitHub](https://github.c
 **Security contributions** — Your contributions made this version much more secure!
 
 > Built to learn. Designed to be simple. Now secure by design.
+
+
+## License
+
+MIT © Sylvère Andrianalisoa
+
+---
