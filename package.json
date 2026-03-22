@@ -1,8 +1,8 @@
 {
   "name": "@josephin/lockcli",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "A secure CLI password manager — store, retrieve and manage your credentials locally from your terminal.",
-  "main": "index.js",
+  "main": "src/index.js",
   "type": "module",
   "homepage": "https://github.com/ANDRIANALISOA-sylvere/LockCLI",
   "repository": {
@@ -13,7 +13,10 @@
     "url": "https://github.com/ANDRIANALISOA-sylvere/LockCLI/issues"
   },
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "node tests/crypto.test.js",
+    "test:security": "node tests/crypto.test.js"
   },
   "dependencies": {
     "@inquirer/prompts": "^8.3.2",
@@ -21,7 +24,9 @@
     "boxen": "^8.0.1",
     "chalk": "^5.6.2",
     "cli-table3": "^0.6.5",
-    "figlet": "^1.11.0"
+    "clipboardy": "^3.0.0",
+    "figlet": "^1.11.0",
+    "nodemon": "^3.1.14"
   },
   "bin": {
     "lockcli": "src/index.js"
@@ -32,8 +37,14 @@
     "manager",
     "security",
     "local",
-    "vault"
+    "vault",
+    "encryption",
+    "aes-256-gcm",
+    "scrypt"
   ],
   "author": "Joséphin Sylvère ANDRIANALISOA",
-  "license": "MIT"
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }
