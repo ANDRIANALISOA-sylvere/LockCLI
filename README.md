@@ -15,10 +15,18 @@ npm install -g @josephin/lockcli
 ## Usage
 
 ```bash
+# Interactive menu
 lockcli
-```
 
-That's it — LockCLI will guide you through an interactive menu.
+# Update vault to latest version
+lockcli update
+
+# Show version
+lockcli --version
+
+# Show help
+lockcli --help
+```
 
 ---
 
@@ -36,7 +44,11 @@ On first launch, LockCLI will ask you to create a **LockCLI master password**. T
   Your local password manager
 
 ✔ Créez votre mot de passe LOCKCLI : ****
-✅ Mot de passe master créé avec succès !
+✅ Mot de passe LockCLI créé avec succès
+
+Version du format: 1.1
+Chiffrement: AES-256-GCM
+Key derivation: scrypt (N=16384, r=8, p=1)
 ```
 
 > **Important** — If you forget your LockCLI password, your stored credentials cannot be recovered.
@@ -61,15 +73,51 @@ Quitter                    — exit LockCLI
 All data is stored locally in ~/.lockcli/
 
 ~/.lockcli/
-├── master.json   ← hashed LockCLI password (bcrypt)
-└── vault.json    ← your credentials (AES-256 encrypted)
+├── master.json   ← master hash (bcrypt 14 rounds) + key salt
+└── vault.json    ← your credentials (AES-256-GCM encrypted)
 ```
 
+### Security Architecture (v1.1)
+
+| Component | Algorithm | Parameters |
+|-----------|-----------|------------|
+| **Encryption** | AES-256-GCM | Authenticated, IV per encryption |
+| **Key Derivation** | scrypt | N=16384, r=8, p=1, 32-byte output |
+| **Master Hash** | bcrypt | 14 rounds |
+| **Salt** | Random | 32 bytes, unique per user |
+
 ```
-LockCLI password  → hashed with bcrypt (never stored in plain text)
-Service passwords → encrypted with AES-256 using your master password
-                    only you can decrypt them
+┌─────────────────────────────────────────────────────────────┐
+│                    SECURITY FLOW (v2.0)                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  1. User Input          Master Password                      │
+│       │                                                       │
+│       ▼                                                       │
+│  2. Key Derivation    scrypt(master + salt) → 32-byte key    │
+│     (scrypt N=16384)   Salt unique par utilisateur           │
+│                                                              │
+│       │                                                       │
+│       ▼                                                       │
+│  3. Encryption        AES-256-GCM(key, iv)                   │
+│     (AES-256-GCM)      Authentification intégrée             │
+│                        IV unique par chiffrement             │
+│                                                              │
+│       │                                                       │
+│       ▼                                                       │
+│  4. Storage            salt:iv:authTag:encrypted              │
+│     (vault.json)       Format verifiable                     │
+│                        Altération détectable                 │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
 ```
+
+**What Changed in v1.1:**
+- **Unique salt per user** (instead of static "lockcli-salt")
+- **AES-256-GCM** (instead of CBC) for authentication
+- **bcrypt 14 rounds** (instead of 10)
+- **Integrity verification** (GCM auth tag)
+- **Version tracking** for future migrations
 
 ---
 
@@ -77,7 +125,7 @@ Service passwords → encrypted with AES-256 using your master password
 
 ```
 ✔ Entrez votre mot de passe LOCKCLI : ****
-Accès autorisé !
+✅ Bienvenue sur LockCLI
 
 ? Que voulez-vous faire ?
 ❯ Ajouter un mot de passe
@@ -92,11 +140,39 @@ Accès autorisé !
 ┌─────┬────────────────────┬──────────────────────────────┬──────────────┬────────────┐
 │  #  │ Service            │ Username                     │ Mot de passe │ Ajouté le  │
 ├─────┼────────────────────┼──────────────────────────────┼──────────────┼────────────┤
-│  1  │ Gmail              │ josephinsylvere@gmail.com    │ monSecret123 │ 20/03/2026 │
+│  1  │ Gmail              │ user@example.com              ••••••••••••  │ 20/03/2026 │
 ├─────┼────────────────────┼──────────────────────────────┼──────────────┼────────────┤
-│  2  │ Facebook           │ josephin.sylvere             │ fb@2026!     │ 20/03/2026 │
+│  2  │ GitHub             │ developer                     ••••••••••••  │ 20/03/2026 │
 └─────┴────────────────────┴──────────────────────────────┴──────────────┴────────────┘
 ```
+
+---
+
+## Migration from v1.0
+
+**IMPORTANT**: If you are using LockCLI v1.0, you have security vulnerabilities that should be addressed:
+
+- Static salt ("lockcli-salt") allows rainbow table attacks
+- AES-256-CBC → no integrity verification
+- bcrypt 10 rounds is weak
+
+**Migrate immediately:**
+
+```bash
+# Just run the update command
+lockcli update
+
+# Or simply run LockCLI - it will prompt you
+lockcli
+```
+
+The update command will:
+1. Ask for your master password
+2. Create an automatic backup in `~/.lockcli/backups/`
+3. Re-encrypt all entries with the new format
+4. Update your vault to v1.1
+
+See [SECURITY.md](SECURITY.md) for details.
 
 ---
 
@@ -105,21 +181,67 @@ Accès autorisé !
 | Package             | Role                                  |
 | ------------------- | ------------------------------------- |
 | `@inquirer/prompts` | Interactive CLI prompts               |
-| `bcrypt`            | Master password hashing               |
+| `bcrypt`            | Master password hashing (14 rounds)   |
+| `crypto`            | AES-256-GCM + scrypt (built-in)       |
 | `chalk`             | Terminal colors                       |
 | `figlet`            | ASCII banner                          |
 | `boxen`             | Styled message boxes                  |
 | `cli-table3`        | Table display                         |
-| `crypto`            | AES-256 encryption (built-in Node.js) |
 
 ---
 
 ## Security
 
-- LockCLI password is **never stored in plain text** — hashed with bcrypt
-- Service passwords are **encrypted with AES-256** — unreadable without your master password
-- All credentials are **stored locally** — no network requests, no telemetry
-- Data is stored in `~/.lockcli/` — your home directory only
+### What We Do
+- LockCLI password is **never stored in plain text** — hashed with bcrypt (14 rounds)
+- Service passwords are **encrypted with AES-256-GCM** — authenticated encryption
+- **Unique salt per user** — prevents rainbow table attacks
+- All credentials are **stored locally** — no network, no telemetry
+- Files have **restrictive permissions** (mode 0600)
+
+### What You Should Do
+- Use a **strong master password** (12+ chars, mixed types)
+- **Backup regularly** — loss of device = loss of data
+- Enable **disk encryption** (BitLocker/FileVault/LUKS)
+- Consider storing `~/.lockcli/` on an **encrypted volume**
+
+### Known Limitations
+- No built-in cloud sync or multi-device support
+- Master password lost = data lost (no recovery)
+- Vulnerable to malware with user privileges
+
+> See [SECURITY.md](SECURITY.md) for full security policy and audit information.
+
+---
+
+## Development
+
+```bash
+# Clone and install
+git clone https://github.com/YOUR_USERNAME/f-LockCLI.git
+cd f-LockCLI
+npm install
+
+# Run locally
+npm run dev
+
+# Run security tests
+npm run test:security
+
+# Build for production
+npm run build
+```
+
+---
+
+## Contributing
+
+Contributions welcome! Especially for:
+- Additional security audits
+- Cross-platform testing
+- Documentation improvements
+
+Please read [SECURITY.md](SECURITY.md) before contributing.
 
 ---
 
@@ -140,8 +262,16 @@ npm uninstall -g @josephin/lockcli
 
 ---
 
+## License
+
+MIT © Sylvère Andrianalisoa
+
+---
+
 ## Author
 
 **Sylvère Andrianalisoa** — [@ANDRIANALISOA-sylvere](https://github.com/ANDRIANALISOA-sylvere)
 
-> Built to learn. Designed to be simple.
+**Security contributions** — Your contributions made this version much more secure!
+
+> Built to learn. Designed to be simple. Now secure by design.
