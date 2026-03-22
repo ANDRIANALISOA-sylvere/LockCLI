@@ -13,6 +13,8 @@ import {
   deletePassword,
   getPasswords,
   updatePassword,
+  exportVault,
+  importVault,
 } from "./vault.js";
 import { CONSTANT } from "./constants.js";
 import chalk from "chalk";
@@ -35,6 +37,8 @@ async function showMenu(masterPassword, keySalt) {
       { name: "Copier un mot de passe", value: CONSTANT.COPY_PASSWORD },
       { name: "Modifier un mot de passe", value: CONSTANT.UPDATED_PASSWORD },
       { name: "Supprimer un mot de passe", value: CONSTANT.DELETE_PASSWORD },
+      { name: "Exporter le vault", value: CONSTANT.EXPORT_VAULT },
+      { name: "Importer un vault", value: CONSTANT.IMPORT_VAULT },
       { name: "Quitter", value: "exit" },
     ],
   });
@@ -54,6 +58,12 @@ async function showMenu(masterPassword, keySalt) {
       break;
     case CONSTANT.DELETE_PASSWORD:
       await handleDelete(masterPassword);
+      break;
+    case CONSTANT.EXPORT_VAULT:
+      await handleExport();
+      break;
+    case CONSTANT.IMPORT_VAULT:
+      await handleImport();
       break;
     case CONSTANT.EXIT:
       console.log(
@@ -329,6 +339,72 @@ async function handleDelete(masterPassword) {
       }),
     );
   }
+}
+
+/**
+ * Gère l'export du vault
+ */
+async function handleExport() {
+  const defaultPath = `lockcli-backup-${new Date().toISOString().slice(0, 10)}.json`;
+
+  const exportPath = await input({
+    message: "Chemin du fichier d'export :",
+    default: defaultPath,
+  });
+
+  const ok = await confirm({
+    message: `Exporter vers "${exportPath}" ? (les mots de passe restent chiffres)`,
+    default: true,
+  });
+
+  if (ok) {
+    exportVault(exportPath);
+  } else {
+    console.log(
+      boxen(chalk.yellow("Export annule"), {
+        padding: 1,
+        borderColor: "yellow",
+        borderStyle: "round",
+      }),
+    );
+  }
+}
+
+/**
+ * Gère l'import d'un vault
+ */
+async function handleImport() {
+  const importPath = await input({
+    message: "Chemin du fichier a importer :",
+  });
+
+  const mode = await select({
+    message: "Mode d'import :",
+    choices: [
+      { name: "Fusionner (garder les existants)", value: "merge" },
+      { name: "Remplacer tout le vault", value: "replace" },
+    ],
+  });
+
+  if (mode === "replace") {
+    const ok = await confirm({
+      message: chalk.red("ATTENTION: Cela ecrasera TOUS vos mots de passe actuels. Continuer ?"),
+      default: false,
+    });
+
+    if (!ok) {
+      console.log(
+        boxen(chalk.yellow("Import annule"), {
+          padding: 1,
+          borderColor: "yellow",
+          borderStyle: "round",
+        }),
+      );
+      return;
+    }
+  }
+
+  importVault(importPath, mode);
 }
 
 export { showMenu };

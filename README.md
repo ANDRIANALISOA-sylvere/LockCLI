@@ -21,6 +21,14 @@ lockcli
 # Update vault to latest version
 lockcli update
 
+# Export vault (encrypted)
+lockcli export
+lockcli export my-backup.json
+
+# Import vault
+lockcli import backup.json             # merge (keep existing)
+lockcli import backup.json --replace   # replace all
+
 # Show version
 lockcli --version
 
@@ -60,8 +68,11 @@ Key derivation: scrypt (N=16384, r=8, p=1)
 ```
 Ajouter un mot de passe    — store a new service credential
 Voir mes mots de passe     — list all stored services in a table
+Copier un mot de passe     — copy to clipboard (auto-clear 30s)
 Modifier un mot de passe   — change the password for a service
 Supprimer un mot de passe  — remove a service credential
+Exporter le vault          — export encrypted vault to a file
+Importer un vault          — import from a LockCLI export file
 Quitter                    — exit LockCLI
 ```
 
@@ -202,6 +213,12 @@ The update command will:
 - **Backup regularly** — loss of device = loss of data
 - Enable **disk encryption** (BitLocker/FileVault/LUKS)
 - Consider storing `~/.lockcli/` on an **encrypted volume**
+
+### Export / Import
+- Exported files contain **encrypted passwords only** — no plaintext ever written to disk
+- Export format includes metadata (version, date, entry count) for validation
+- Import **merge** mode skips services that already exist in your vault
+- Import **replace** mode overwrites the entire vault (with confirmation prompt)
 
 ### Known Limitations
 - No built-in cloud sync or multi-device support

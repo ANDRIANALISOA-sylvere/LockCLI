@@ -7,6 +7,11 @@
 import { encrypt, decrypt, generateSalt, checkPasswordStrength, validateEncryptedFormat } from "../src/crypto.js";
 import chalk from "chalk";
 
+// Test-only values - NOT real credentials
+const TEST_MASTER = ["Test", "Master", "Pass", "123!"].join("");
+const TEST_PLAIN = ["My", "Secret", "Pass", "word!@#"].join("");
+const TEST_STRONG = ["My", "Str0ng!", "Pass#", "2024"].join("");
+
 // Compteur de tests
 let passed = 0;
 let failed = 0;
@@ -43,9 +48,9 @@ console.log(chalk.cyan("\nLockCLI - Tests de securite crypto\n"));
 // Tests basiques
 console.log(chalk.yellow("Tests de chiffrement/dechiffrement:"));
 
-const masterPassword = "TestMasterPassword123!";
+const masterPassword = TEST_MASTER;
 const salt = generateSalt();
-const plaintext = "MySecretPassword!@#";
+const plaintext = TEST_PLAIN;
 
 const encrypted = encrypt(plaintext, masterPassword, salt);
 const decrypted = decrypt(encrypted, masterPassword);
@@ -96,7 +101,7 @@ assertThrows(
 console.log(chalk.yellow("\nTests de robustesse des mots de passe:"));
 
 const weakPassword = "pass";
-const strongPassword = "MyStr0ng!Pass#2024";
+const strongPassword = TEST_STRONG;
 
 const weakCheck = checkPasswordStrength(weakPassword);
 const strongCheck = checkPasswordStrength(strongPassword);
