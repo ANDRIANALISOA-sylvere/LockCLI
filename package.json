@@ -1,6 +1,6 @@
 {
   "name": "@josephin/lockcli",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A secure CLI password manager — store, retrieve and manage your credentials locally from your terminal.",
   "main": "src/index.js",
   "type": "module",
