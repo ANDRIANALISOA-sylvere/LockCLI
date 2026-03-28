@@ -4,6 +4,10 @@
 
 LockCLI stores all your passwords **locally on your machine** — no cloud, no server, no internet connection required. Your data never leaves your computer.
 
+<p align="center">
+  <img src="./screenshot.png" alt="Demo" />
+</p>
+
 ---
 
 ## Installation
